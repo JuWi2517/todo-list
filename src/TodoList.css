@@ -1,4 +1,4 @@
-/* Container for the whole app */
+
 .TodoList {
     max-width: 600px;
     margin: 30px auto;
@@ -8,7 +8,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Style for the dropdown and input */
+
 .TodoList select,
 .TodoList input {
     width: 100%;
@@ -16,10 +16,10 @@
     margin-bottom: 20px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    box-sizing: border-box; /* Makes padding not affect the total width */
+    box-sizing: border-box;
 }
 
-/* Style for each todo item */
+
 .item {
     display: flex;
     justify-content: space-between;
@@ -29,12 +29,12 @@
     border-bottom: 1px solid #eee;
 }
 
-/* Style for item when in editing mode */
+
 .item.editing {
     background: #eef9ff;
 }
 
-/* Buttons for editing and deleting */
+
 .item button {
     padding: 5px 10px;
     margin-left: 10px;
@@ -44,10 +44,10 @@
 }
 
 .item .editing button {
-    border: 1px solid #ddd; /* Slightly different style for 'Done' button in editing mode */
+    border: 1px solid #ddd;
 }
 
-/* Specific styles for different buttons */
+
 .item button:hover {
     opacity: 0.9;
 }
@@ -56,7 +56,7 @@
     background-color: green;
 }
 
-/* Buttons for marking as done and undone */
+
 .mark-done-button {
     background-color: #28a745;
     color: white;
@@ -80,7 +80,7 @@
     background: #45a049;
 }
 
-/* Placeholder text color */
+
 ::placeholder {
     color: #ccc;
 }
