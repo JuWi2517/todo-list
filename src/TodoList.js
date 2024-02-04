@@ -1,171 +1,134 @@
-import React, { useState } from 'react';
-import "./TodoList.css";
+import React, { useState, useEffect } from 'react';
+import './TodoList.css';
 
 function TodoList() {
     const [items, setItems] = useState([]);
-    const [boughtItems, setBoughtItems] = useState([]);
-    const [isArchived, setArchive] = useState(false);
-    const [isDone, setDone] = useState(false);
+    const [categories] = useState(['Nákup', 'Práce', 'Domov', 'Osobní']);
+    const [currentFilter, setCurrentFilter] = useState('All');
+    const [doneFilter, setDoneFilter] = useState('All'); // 'All', 'Done', or 'Undone'
     const [newItemName, setNewItemName] = useState('');
-    const [showAddItemFields, setShowAddItemFields] = useState(false);
-    const [showUserModal, setShowUserModal] = useState(false);
-    const [username, setUsername] = useState('');
-    const hardcodedUsers = ['Matej', 'Strom', 'Nekolas'];
-    const categories = ['Groceries', 'Work', 'Home', 'Personal'];
+
+    useEffect(() => {
+        const savedItems = localStorage.getItem('todoList');
+        if (savedItems) {
+            setItems(JSON.parse(savedItems));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('todoList', JSON.stringify(items));
+    }, [items]);
 
     const addItem = () => {
-        const newId = items.length > 0 ? Math.max(...items.map(item => item.id)) + 1 : 1;
-        const newItem = {
-            id: newId,
-            name: newItemName,
-            category: categories[0],
-            isEditing: false,
-        };
-        setItems([...items, newItem]);
-        setNewItemName('');
-        setShowAddItemFields(false);
+        if (newItemName.trim() !== '') {
+            const newItem = {
+                id: Date.now(),
+                name: newItemName.trim(),
+                category: categories[0],
+                isEditing: false,
+                done: false,
+            };
+            setItems([...items, newItem]);
+            setNewItemName('');
+        }
     };
 
-    const boughtItem = (id) => {
-        setBoughtItems(prevBoughtItems => {
-            if (prevBoughtItems.includes(id)) {
-                return prevBoughtItems.filter(itemId => itemId !== id);
-            } else {
-                return [...prevBoughtItems, id];
-            }
-        });
+    const editItem = (id, newName, newCategory) => {
+        setItems(items.map(item =>
+            item.id === id ? { ...item, name: newName, category: newCategory, isEditing: false } : item
+        ));
     };
 
     const removeItem = (id) => {
         setItems(items.filter(item => item.id !== id));
     };
 
-    const startEditing = (id) => {
-        setItems(items.map(item => item.id === id ? { ...item, isEditing: true } : item));
+    const toggleEdit = (id) => {
+        setItems(items.map(item =>
+            item.id === id ? { ...item, isEditing: !item.isEditing } : item
+        ));
     };
 
-    const editItemName = (id, newName) => {
-        setItems(items.map(item => item.id === id ? { ...item, name: newName, isEditing: false } : item));
+    const toggleDone = (id) => {
+        setItems(items.map(item =>
+            item.id === id ? { ...item, done: !item.done } : item
+        ));
     };
 
-    const editItemCategory = (id, newCategory) => {
-        setItems(items.map(item => item.id === id ? { ...item, category: newCategory } : item));
-    };
-
-    const addUser = () => {
-        alert('Uživatel byl úspěšně přidán: ' + username);
-        setUsername('');
-        setShowUserModal(false);
-    };
-
-    const showModal = () => {
-        setShowUserModal(true);
-    };
-
-    const removeAll = () => {
-        setItems([]);
-    };
-
-    const archiveList = () => {
-        setArchive(true);
-        alert("Seznam byl archivován");
-    };
-
-    const listDone = () => {
-        setDone(true);
-        alert("Seznam byl označen jako hotový");
-    };
+    const filteredItems = items
+        .filter(item => currentFilter === 'All' || item.category === currentFilter)
+        .filter(item => {
+            if (doneFilter === 'Done') return item.done;
+            if (doneFilter === 'Undone') return !item.done;
+            return true; // doneFilter is 'All'
+        });
 
     return (
-        <div className="ShopList">
-            <div className="container">
-                <h1>ÚKOLY</h1>
-                <div className="item-list mb-4">
-                    {items.map(item => (
-                        <div
-                            id={item.id}
-                            className={`d-flex justify-content-between align-items-center border p-2 mb-2 ${boughtItems.includes(item.id) ? 'bg-green' : ''}`}
-                            key={item.id}
-                        >
-                            {item.isEditing ? (
-                                <input
-                                    type="text"
-                                    defaultValue={item.name}
-                                    onBlur={(e) => editItemName(item.id, e.target.value)}
-                                    onKeyPress={(e) => {
-                                        if (e.key === 'Enter') {
-                                            editItemName(item.id, e.target.value);
-                                        }
-                                    }}
-                                    autoFocus
-                                />
-                            ) : (
-                                <div className="item-name">{item.name}</div>
-                            )}
+        <div className="TodoList">
+            <div>
+                <select onChange={(e) => setCurrentFilter(e.target.value)} value={currentFilter}>
+                    <option value="All">Všechny kategorie</option>
+                    {categories.map((category, index) => (
+                        <option key={index} value={category}>{category}</option>
+                    ))}
+                </select>
+                <select onChange={(e) => setDoneFilter(e.target.value)} value={doneFilter}>
+                    <option value="All">Všechny úkoly</option>
+                    <option value="Done">Dokončené úkoly</option>
+                    <option value="Undone">Nedokončené úkoly</option>
+                </select>
+            </div>
 
-                            {/* Category Dropdown */}
+            {filteredItems.map(item => (
+                <div key={item.id} className={`item ${item.isEditing ? 'editing' : ''} ${item.done ? 'done' : ''}`}>
+                    {item.isEditing ? (
+                        <>
+                            <input
+                                type="text"
+                                defaultValue={item.name}
+                                onBlur={(e) => editItem(item.id, e.target.value, item.category)}
+                                className="item-name"
+                            />
                             <select
-                                value={item.category}
-                                onChange={(e) => editItemCategory(item.id, e.target.value)}
+                                defaultValue={item.category}
+                                onChange={(e) => editItem(item.id, item.name, e.target.value)}
                                 className="item-category"
-                                disabled={!item.isEditing}
                             >
                                 {categories.map((category, index) => (
                                     <option key={index} value={category}>{category}</option>
                                 ))}
                             </select>
+                            <button onClick={() => toggleEdit(item.id)}>Hotovo</button>
+                        </>
+                    ) : (
+                        <>
+                            <span className="item-name">{item.name}</span>
+                            <span className="item-category">{item.category}</span>
+                            <button onClick={() => toggleEdit(item.id)}>Edit</button>
+                            <button onClick={() => toggleDone(item.id)}>
+                                {item.done ? 'Označ jako nedokončený' : 'Označ jako hotový'}
+                            </button>
+                            <button onClick={() => removeItem(item.id)}>Odstranit</button>
+                        </>
+                    )}
+                </div>
+            ))}
 
-                            <div>
-                                {item.isEditing ? (
-                                    <button className="btn btn-secondary btn-sm me-2" onClick={() => editItemName(item.id, item.name)}>Cancel</button>
-                                ) : (
-                                    <>
-                                        <button className="btn btn-primary btn-sm me-2" onClick={() => startEditing(item.id)}>Edit</button>
-                                        <button className="btn btn-success btn-sm me-2" onClick={() => boughtItem(item.id)}>Hotovo</button>
-                                        <button className="btn btn-danger btn-sm" onClick={() => removeItem(item.id)}>Odebrat</button>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                {showAddItemFields && (
-                    <div>
-                        <input
-                            type="text"
-                            placeholder="Item name"
-                            value={newItemName}
-                            onChange={(e) => setNewItemName(e.target.value)}
-                        />
-                        <button onClick={addItem}>Potvrdit</button>
-                    </div>
-                )}
-                {showUserModal && (
-                    <div className="modal">
-                        <div className="modal-content">
-                            <span className="close" onClick={() => setShowUserModal(false)}>&times;</span>
-                            <input
-                                type="text"
-                                placeholder="Uživatelské jméno"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                            <button onClick={addUser}>Přidat uživatele</button>
-                            <ul>
-                                {hardcodedUsers.map(user => (
-                                    <li key={user}>{user}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                )}
-                <div className="actions mb-4">
-                    <button className="btn btn-primary me-2" onClick={() => setShowAddItemFields(true)}>Přidat položku</button>
-                    <button className="btn btn-secondary me-2" onClick={showModal}>Přidat uživatele</button>
-                    <button className="btn btn-info me-2" onClick={listDone}>Označit jako hotové</button>
-                    <button className="btn btn-warning me-2" onClick={archiveList}>Archivovat</button>
-                    <button className="btn btn-danger" onClick={removeAll}>Smazat položky</button>
-                </div>
+            <div>
+                <input
+                    type="text"
+                    placeholder="Přidat nový Úkol"
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            addItem();
+                        }
+                    }}
+                />
+                <button onClick={addItem}>Přidat úkol</button>
+
+
             </div>
         </div>
     );

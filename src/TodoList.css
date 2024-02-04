@@ -1,91 +1,86 @@
-
-
-.ShopList {
-    font-family: 'Arial', sans-serif;
-}
-.container {
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-    align-items: center; /* Center content horizontally */
-    justify-content: center; /* Center content vertically (if the container has a set height) */
-    max-width: 800px; /* Adjust based on your preference */
-    margin: 0 auto; /* Centers the container in the viewport */
-    padding: 20px; /* Optional: adds space inside the container */
-}
-.container > div {
-    width: 100%; /* Makes child divs take up the full width of the flex container */
-    margin-bottom: 20px; /* Adds space between child divs */
-    /* More styling as needed */
+/* Container for the whole app */
+.TodoList {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.ShopList input[type="text"],
-.ShopList input[type="number"] {
+/* Style for the dropdown and input */
+.TodoList select,
+.TodoList input {
+    width: 100%;
     padding: 10px;
-    margin: 10px 0;
+    margin-bottom: 20px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    width: calc(100% - 22px); /* Account for padding and border */
+    box-sizing: border-box; /* Makes padding not affect the total width */
 }
 
-.ShopList button {
-    padding: 10px 15px;
-    margin-right: 10px;
+/* Style for each todo item */
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #ffffff;
+    border-bottom: 1px solid #eee;
+}
+
+/* Style for item when in editing mode */
+.item.editing {
+    background: #eef9ff;
+}
+
+/* Buttons for editing and deleting */
+.item button {
+    padding: 5px 10px;
+    margin-left: 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-.ShopList .btn-primary {
-    background-color: #007bff;
-    color: white;
+.item .editing button {
+    border: 1px solid #ddd; /* Slightly different style for 'Done' button in editing mode */
 }
 
-.ShopList .btn-secondary {
-    background-color: #6c757d;
-    color: white;
+/* Specific styles for different buttons */
+.item button:hover {
+    opacity: 0.9;
 }
+.item.done {
 
-.ShopList .btn-info {
-    background-color: #17a2b8;
-    color: white;
-}
-
-.ShopList .btn-warning {
-    background-color: #ffc107;
-    color: black; /* for better contrast */
-}
-
-.ShopList .btn-danger {
-    background-color: #dc3545;
-    color: white;
-}
-
-.ShopList .btn:hover {
-    opacity: 0.8;
-}
-.bg-green {
     background-color: green;
 }
 
-.ShopList .actions {
-    text-align: center;
-}
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Buttons for marking as done and undone */
+.mark-done-button {
+    background-color: #28a745;
+    color: white;
 }
 
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    min-width: 300px;
+.mark-undone-button {
+    background-color: #ffc107;
+    color: white;
+}
+.add-item-button {
+    width: 100%;
+    padding: 10px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-item-button:hover {
+    background: #45a049;
+}
+
+/* Placeholder text color */
+::placeholder {
+    color: #ccc;
 }
